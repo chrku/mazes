@@ -1,5 +1,6 @@
 import algorithms.BinaryTree;
 import algorithms.MazeGenerator;
+import algorithms.Sidewinder;
 import grid.Grid;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -12,7 +13,7 @@ import java.util.concurrent.Callable;
 class Main implements Callable<Integer> {
 
     @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from", required = true)
-    private final String algorithm = "BinaryTree";
+    private String algorithm = "BinaryTree";
 
     @Option(names = {"-r", "--numRows"}, description = "Number of rows for maze", required = true)
     private int numRows;
@@ -30,18 +31,20 @@ class Main implements Callable<Integer> {
     @Override
     public Integer call() {
         Grid grid = new Grid(numRows, numCols);
+        MazeGenerator generator;
 
         switch (algorithm) {
-            case "BinaryTree" -> {
-                MazeGenerator generator = new BinaryTree();
-                generator.generate(grid);
-                System.out.println(grid);
-                return 0;
-            }
+            case "BinaryTree" -> generator = new BinaryTree();
+            case "Sidewinder" -> generator = new Sidewinder();
             default -> {
                 System.out.println("Unsupported algorithm");
                 return 1;
             }
         }
+
+        generator.generate(grid);
+        System.out.println(grid);
+
+        return 0;
     }
 }
