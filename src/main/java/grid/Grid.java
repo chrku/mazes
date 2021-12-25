@@ -1,17 +1,22 @@
 package grid;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class Grid {
     private final int numRows;
     private final int numColumns;
 
-    private List<List<Cell>> cells;
+    private final List<List<Cell>> cells;
 
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
         this.numColumns = numColumns;
+        this.cells = new ArrayList<>();
+
         prepareGrid();
     }
 
@@ -54,10 +59,18 @@ public class Grid {
             for (int j = 0; j < numColumns; j++) {
                 Cell current = cells.get(i).get(j);
 
-                if (i - 1 >= 0) { current.setNorth(cells.get(i - 1).get(j)); }
-                if (i + 1 < numRows) { current.setNorth(cells.get(i + 1).get(j)); }
-                if (j - 1 >= 0) { current.setNorth(cells.get(i).get(j - 1)); }
-                if (j + 1 < numColumns) { current.setNorth(cells.get(i).get(j + 1)); }
+                if (i - 1 >= 0) {
+                    current.setNorth(cells.get(i - 1).get(j));
+                }
+                if (i + 1 < numRows) {
+                    current.setSouth(cells.get(i + 1).get(j));
+                }
+                if (j - 1 >= 0) {
+                    current.setWest(cells.get(i).get(j - 1));
+                }
+                if (j + 1 < numColumns) {
+                    current.setEast(cells.get(i).get(j + 1));
+                }
             }
         }
     }
@@ -128,7 +141,47 @@ public class Grid {
         return new RowIterator();
     }
 
-    public CellIterator CellIterator() {
+    public CellIterator cellIterator() {
         return new CellIterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("+");
+        builder.append("---+".repeat(Math.max(0, numColumns)));
+        builder.append("\n");
+
+        rowIterator().forEachRemaining((List<Cell> l) -> {
+            StringBuilder top = new StringBuilder();
+            StringBuilder bottom = new StringBuilder();
+
+            top.append("|");
+            bottom.append("+");
+
+            l.forEach((Cell c) -> {
+                top.append("   ");
+                if (!c.isLinked(c.getEast())) {
+                    top.append("|");
+                } else {
+                    top.append(" ");
+                }
+
+                if (!c.isLinked(c.getSouth())) {
+                    bottom.append("---");
+                } else {
+                    bottom.append("   ");
+                }
+                bottom.append("+");
+            });
+
+            builder.append(top);
+            builder.append("\n");
+            builder.append(bottom);
+            builder.append("\n");
+        });
+
+        return builder.toString();
     }
 }

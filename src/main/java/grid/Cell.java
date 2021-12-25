@@ -95,6 +95,9 @@ public class Cell {
     }
 
     public boolean isLinked(Cell cell) {
+        if (cell == null) {
+            return false;
+        }
         return links.contains(cell);
     }
 
