@@ -1,6 +1,6 @@
-package algorithms;
+package org.chrku.algorithms;
 
-import grid.Grid;
+import org.chrku.grid.Grid;
 
 public interface MazeGenerator {
     void generate(Grid grid);

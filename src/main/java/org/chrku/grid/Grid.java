@@ -1,4 +1,4 @@
-package grid;
+package org.chrku.grid;
 
 import java.util.ArrayList;
 import java.util.Iterator;

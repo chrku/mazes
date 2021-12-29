@@ -1,7 +1,9 @@
-import algorithms.BinaryTree;
-import algorithms.MazeGenerator;
-import algorithms.Sidewinder;
-import grid.Grid;
+package org.chrku;
+
+import org.chrku.algorithms.BinaryTree;
+import org.chrku.algorithms.MazeGenerator;
+import org.chrku.algorithms.Sidewinder;
+import org.chrku.grid.Grid;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

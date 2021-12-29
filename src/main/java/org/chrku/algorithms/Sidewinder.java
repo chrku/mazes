@@ -1,7 +1,7 @@
-package algorithms;
+package org.chrku.algorithms;
 
-import grid.Cell;
-import grid.Grid;
+import org.chrku.grid.Cell;
+import org.chrku.grid.Grid;
 
 import java.util.ArrayList;
 import java.util.List;
