@@ -13,7 +13,6 @@ import java.util.concurrent.Callable;
 @Command(name = "generate_maze", mixinStandardHelpOptions = true,
         description = "Generates maze and outputs it.")
 class Main implements Callable<Integer> {
-
     @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from", required = true)
     private String algorithm = "BinaryTree";
 
@@ -22,6 +21,17 @@ class Main implements Callable<Integer> {
 
     @Option(names = {"-c", "--numCols"}, description = "Number of columns for maze", required = true)
     private int numCols;
+
+    private static enum OutputFormat {
+        IMAGE, TEXT
+    }
+
+    @Option(names = {"-o", "--outputFormat"}, description = "Valid values: ${COMPLETION-CANDIDATES}",
+            defaultValue = "IMAGE")
+    private OutputFormat outputFormat;
+
+    @Option(names = {"-p", "--path"}, description = "Output path", defaultValue = "")
+    private String outputPath;
 
     // this example implements Callable, so parsing, error handling and handling user
     // requests for usage help or version help can be done with one line of code.
@@ -45,7 +55,14 @@ class Main implements Callable<Integer> {
         }
 
         generator.generate(grid);
-        System.out.println(grid);
+
+        switch (outputFormat) {
+            case IMAGE -> {
+            }
+            case TEXT -> {
+                System.out.println(grid);
+            }
+        }
 
         return 0;
     }

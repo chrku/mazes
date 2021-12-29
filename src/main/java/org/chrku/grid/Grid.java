@@ -1,5 +1,10 @@
 package org.chrku.grid;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -183,5 +188,48 @@ public class Grid {
         });
 
         return builder.toString();
+    }
+
+    public void writeImage(Path path, int cellSize, int lineWidth) throws IOException {
+        // Determine width and height of output image
+        int totalCellSize = cellSize + 2 * lineWidth;
+        int width = numColumns * totalCellSize;
+        int height = numRows * totalCellSize;
+
+        // Create image
+        BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = outputImage.createGraphics();
+
+        // White background
+        graphics2D.setColor(new Color(0xFF, 0xFF,0xFF));
+        graphics2D.fillRect(0, 0, width, height);
+
+        // Black lines
+        graphics2D.setColor(new Color(0, 0,0));
+
+        // Draw borders
+        for (var it = cellIterator(); it.hasNext(); ) {
+            Cell current = it.next();
+
+            int x = current.getColumn();
+            int y = current.getColumn();
+
+            if (current.getNorth() == null || !current.isLinked(current.getNorth())) {
+                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, totalCellSize, lineWidth);
+            }
+            if (current.getSouth() == null || !current.isLinked(current.getSouth())) {
+                graphics2D.fillRect(x * totalCellSize, y * totalCellSize + lineWidth + cellSize, totalCellSize,
+                        lineWidth);
+            }
+            if (current.getWest() == null || !current.isLinked(current.getWest())) {
+                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, lineWidth, totalCellSize);
+            }
+            if (current.getEast() == null || !current.isLinked(current.getEast())) {
+                graphics2D.drawRect(x * totalCellSize + lineWidth + cellSize,
+                        y * totalCellSize, lineWidth, totalCellSize);
+            }
+        }
+
+        ImageIO.write(outputImage, "png", path.toFile());
     }
 }
