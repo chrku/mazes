@@ -215,17 +215,25 @@ public class Grid {
             int y = current.getRow();
 
             if (current.getNorth() == null || !current.isLinked(current.getNorth())) {
-                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, totalCellSize, lineWidth);
+                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, totalCellSize + lineWidth, lineWidth);
             }
             if (current.getSouth() == null || !current.isLinked(current.getSouth())) {
-                graphics2D.fillRect(x * totalCellSize, y * totalCellSize + lineWidth + cellSize, totalCellSize,
+                int y_loc = y * totalCellSize + totalCellSize;
+                if (current.getSouth() == null) {
+                    y_loc = y * totalCellSize + cellSize + lineWidth;
+                }
+                graphics2D.fillRect(x * totalCellSize, y_loc, totalCellSize,
                         lineWidth);
             }
             if (current.getWest() == null || !current.isLinked(current.getWest())) {
                 graphics2D.fillRect(x * totalCellSize, y * totalCellSize, lineWidth, totalCellSize);
             }
             if (current.getEast() == null || !current.isLinked(current.getEast())) {
-                graphics2D.fillRect(x * totalCellSize + lineWidth + cellSize,
+                int x_loc = x * totalCellSize + totalCellSize;
+                if (current.getEast() == null) {
+                    x_loc = x * totalCellSize + cellSize + lineWidth;
+                }
+                graphics2D.fillRect(x_loc,
                         y * totalCellSize, lineWidth, totalCellSize);
             }
         }
