@@ -212,7 +212,7 @@ public class Grid {
             Cell current = it.next();
 
             int x = current.getColumn();
-            int y = current.getColumn();
+            int y = current.getRow();
 
             if (current.getNorth() == null || !current.isLinked(current.getNorth())) {
                 graphics2D.fillRect(x * totalCellSize, y * totalCellSize, totalCellSize, lineWidth);
@@ -225,7 +225,7 @@ public class Grid {
                 graphics2D.fillRect(x * totalCellSize, y * totalCellSize, lineWidth, totalCellSize);
             }
             if (current.getEast() == null || !current.isLinked(current.getEast())) {
-                graphics2D.drawRect(x * totalCellSize + lineWidth + cellSize,
+                graphics2D.fillRect(x * totalCellSize + lineWidth + cellSize,
                         y * totalCellSize, lineWidth, totalCellSize);
             }
         }

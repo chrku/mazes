@@ -8,6 +8,9 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 @Command(name = "generate_maze", mixinStandardHelpOptions = true,
@@ -31,7 +34,7 @@ class Main implements Callable<Integer> {
     private OutputFormat outputFormat;
 
     @Option(names = {"-p", "--path"}, description = "Output path", defaultValue = "")
-    private String outputPath;
+    private Path outputPath;
 
     // this example implements Callable, so parsing, error handling and handling user
     // requests for usage help or version help can be done with one line of code.
@@ -58,10 +61,18 @@ class Main implements Callable<Integer> {
 
         switch (outputFormat) {
             case IMAGE -> {
+                if (outputPath.toString().isEmpty()) {
+                    System.out.println("Need output path for image");
+                } else {
+                    try {
+                        grid.writeImage(outputPath, 20, 2);
+                    } catch (IOException e) {
+                        System.out.println("Could not write to given path");
+                        e.printStackTrace();
+                    }
+                }
             }
-            case TEXT -> {
-                System.out.println(grid);
-            }
+            case TEXT -> System.out.println(grid);
         }
 
         return 0;
