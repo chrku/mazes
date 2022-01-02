@@ -10,14 +10,23 @@ import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 @Command(name = "generate_maze", mixinStandardHelpOptions = true,
         description = "Generates maze and outputs it.")
 class Main implements Callable<Integer> {
-    @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from", required = true)
-    private String algorithm = "BinaryTree";
+
+    private enum OutputFormat {
+        image, text
+    }
+
+    private enum Algorithm {
+        binary_tree, sidewinder
+    }
+
+    @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from. " +
+            "Valid values: ${COMPLETION-CANDIDATES}", required = true)
+    private Algorithm algorithm = Algorithm.binary_tree;
 
     @Option(names = {"-r", "--numRows"}, description = "Number of rows for maze", required = true)
     private int numRows;
@@ -25,12 +34,15 @@ class Main implements Callable<Integer> {
     @Option(names = {"-c", "--numCols"}, description = "Number of columns for maze", required = true)
     private int numCols;
 
-    private enum OutputFormat {
-        IMAGE, TEXT
-    }
+    @Option(names = {"-l", "--lineWidth"}, description = "Line width for image output", defaultValue = "2")
+    private int lineWidth = 2;
 
-    @Option(names = {"-o", "--outputFormat"}, description = "Valid values: ${COMPLETION-CANDIDATES}",
-            defaultValue = "IMAGE")
+    @Option(names = {"-s", "--cellSize"}, description = "Cell size for image output", defaultValue = "20")
+    private int cellSize = 20;
+
+    @Option(names = {"-o", "--outputFormat"}, description = "Output format of maze. " +
+            "Valid values: ${COMPLETION-CANDIDATES}",
+            defaultValue = "image")
     private OutputFormat outputFormat;
 
     @Option(names = {"-p", "--path"}, description = "Output path", defaultValue = "")
@@ -49,8 +61,8 @@ class Main implements Callable<Integer> {
         MazeGenerator generator;
 
         switch (algorithm) {
-            case "BinaryTree" -> generator = new BinaryTree();
-            case "Sidewinder" -> generator = new Sidewinder();
+            case binary_tree -> generator = new BinaryTree();
+            case sidewinder -> generator = new Sidewinder();
             default -> {
                 System.out.println("Unsupported algorithm");
                 return 1;
@@ -60,19 +72,19 @@ class Main implements Callable<Integer> {
         generator.generate(grid);
 
         switch (outputFormat) {
-            case IMAGE -> {
+            case image -> {
                 if (outputPath.toString().isEmpty()) {
                     System.out.println("Need output path for image");
                 } else {
                     try {
-                        grid.writeImage(outputPath, 20, 2);
+                        grid.writeImage(outputPath, cellSize, lineWidth);
                     } catch (IOException e) {
                         System.out.println("Could not write to given path");
                         e.printStackTrace();
                     }
                 }
             }
-            case TEXT -> System.out.println(grid);
+            case text -> System.out.println(grid);
         }
 
         return 0;
