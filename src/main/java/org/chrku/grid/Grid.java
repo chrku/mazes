@@ -3,6 +3,7 @@ package org.chrku.grid;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -192,20 +193,19 @@ public class Grid {
 
     public void writeImage(Path path, int cellSize, int lineWidth) throws IOException {
         // Determine width and height of output image
-        int totalCellSize = cellSize + 2 * lineWidth;
-        int width = numColumns * totalCellSize;
-        int height = numRows * totalCellSize;
+        int totalCellSize = cellSize + lineWidth;
+        int width = numColumns * totalCellSize + lineWidth;
+        int height = numRows * totalCellSize + lineWidth;
 
         // Create image
-        BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = outputImage.createGraphics();
+        BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        WritableRaster raster = outputImage.getRaster();
+
+        Color white =  new Color(255, 255, 255);
+        Color black =  new Color(0, 0, 0);
 
         // White background
-        graphics2D.setColor(new Color(0xFF, 0xFF,0xFF));
-        graphics2D.fillRect(0, 0, width, height);
-
-        // Black lines
-        graphics2D.setColor(new Color(0, 0,0));
+        fillRect(raster, 0, 0, width, height, white);
 
         // Draw borders
         for (var it = cellIterator(); it.hasNext(); ) {
@@ -215,29 +215,45 @@ public class Grid {
             int y = current.getRow();
 
             if (current.getNorth() == null || !current.isLinked(current.getNorth())) {
-                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, totalCellSize + lineWidth, lineWidth);
+                fillRect(raster,
+                        x * totalCellSize, y * totalCellSize,
+                        cellSize + 2 * lineWidth, lineWidth,
+                        black);
             }
             if (current.getSouth() == null || !current.isLinked(current.getSouth())) {
-                int y_loc = y * totalCellSize + totalCellSize;
-                if (current.getSouth() == null) {
-                    y_loc = y * totalCellSize + cellSize + lineWidth;
-                }
-                graphics2D.fillRect(x * totalCellSize, y_loc, totalCellSize,
-                        lineWidth);
+                fillRect(raster,
+                        x * totalCellSize, y * totalCellSize + totalCellSize,
+                        cellSize + 2 * lineWidth, lineWidth,
+                        black);
             }
             if (current.getWest() == null || !current.isLinked(current.getWest())) {
-                graphics2D.fillRect(x * totalCellSize, y * totalCellSize, lineWidth, totalCellSize);
+                fillRect(raster,
+                        x * totalCellSize, y * totalCellSize,
+                        lineWidth, cellSize + 2 * lineWidth,
+                        black);
             }
             if (current.getEast() == null || !current.isLinked(current.getEast())) {
-                int x_loc = x * totalCellSize + totalCellSize;
-                if (current.getEast() == null) {
-                    x_loc = x * totalCellSize + cellSize + lineWidth;
-                }
-                graphics2D.fillRect(x_loc,
-                        y * totalCellSize, lineWidth, totalCellSize);
+                fillRect(raster,
+                        x * totalCellSize + totalCellSize, y * totalCellSize,
+                        lineWidth, totalCellSize,
+                        black);
             }
         }
 
         ImageIO.write(outputImage, "png", path.toFile());
+    }
+
+    private void fillRect(WritableRaster raster, int x, int y, int width, int height, Color color) {
+        int[] comp = new int[3];
+
+        comp[0] = color.getRed();
+        comp[1] = color.getGreen();
+        comp[2] = color.getBlue();
+
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                raster.setPixel(x + j, y + i, comp);
+            }
+        }
     }
 }

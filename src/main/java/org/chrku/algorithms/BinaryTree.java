@@ -5,12 +5,12 @@ import org.chrku.grid.Grid;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BinaryTree implements MazeGenerator {
     @Override
     public void generate(Grid grid) {
-        Random rand = new Random();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         grid.cellIterator().forEachRemaining((Cell c) -> {
             List<Cell> neighbours = new ArrayList<>();
 
