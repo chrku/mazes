@@ -25,7 +25,7 @@ class Main implements Callable<Integer> {
     @Option(names = {"-c", "--numCols"}, description = "Number of columns for maze", required = true)
     private int numCols;
 
-    private static enum OutputFormat {
+    private enum OutputFormat {
         IMAGE, TEXT
     }
 

@@ -2,22 +2,17 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for mazes" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="project" value="net.chrku/mazes" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/info/picocli/picocli-codegen/4.6.2/picocli-codegen-4.6.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/info/picocli/picocli/4.6.2/picocli-4.6.2.jar" />
-        </processorPath>
         <module name="mazes" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="mazes" options="-Aproject=net.chrku/mazes" />
+      <module name="mazes" options="" />
     </option>
   </component>
 </project>
