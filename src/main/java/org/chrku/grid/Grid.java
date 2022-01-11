@@ -30,6 +30,14 @@ public class Grid {
         return numRows * numColumns;
     }
 
+    public int rows() {
+        return numRows;
+    }
+
+    public int columns() {
+        return numColumns;
+    }
+
     public Cell getCell(int row, int col) {
         if (row < 0 || col < 0 || row >= numRows || col >= numColumns) {
             return null;
