@@ -27,6 +27,10 @@ public class DijkstraSolver {
         distances.get(startRow).set(startColumn, 0.0);
     }
 
+    public List<List<Double>> getDistances() {
+        return distances;
+    }
+
     public void solve() {
         PriorityQueue<DijkstraNode> queue = new PriorityQueue<>();
         Set<Cell> visited = new HashSet<>();

@@ -6,30 +6,44 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
-public class LabeledGrid {
-    private final Grid grid;
-    private final List<List<Double>> elements;
+public class LabeledGrid extends Grid {
+    private final Color baseColor;
+    private List<List<Double>> labels;
 
-    LabeledGrid(Grid grid, List<List<Double>> labels) {
-        this.grid = grid;
-        this.elements = labels;
+    public LabeledGrid(int numRows, int numCols, Color baseColor) {
+        super(numRows, numCols);
+
+        this.baseColor = baseColor;
+        this.labels = new ArrayList<>();
+
+        for (int i = 0; i < rows(); ++i) {
+            labels.add(new ArrayList<>());
+            for (int j = 0; j < columns(); ++j) {
+                labels.get(i).add(0.0);
+            }
+        }
     }
 
     private static Color getInterpolatedColor(double value,
                                               double minVal,
                                               double maxVal,
                                               float hue,
-                                              float saturation) {
-        double brightness = (value - minVal) / (maxVal - minVal);
-        return Color.getHSBColor(hue, saturation, (float) brightness);
+                                              float brightness) {
+        double saturation = (value - minVal) / (maxVal - minVal);
+        return Color.getHSBColor(hue, (float) saturation, brightness);
+    }
+
+    public void setLabels(List<List<Double>> labels) {
+        this.labels = labels;
     }
 
     private double getMinVal() {
         double minVal = Double.MAX_VALUE;
 
-        for (List<Double> row : elements) {
+        for (List<Double> row : labels) {
             for (double elem : row) {
                 if (elem < minVal) {
                     minVal = elem;
@@ -43,7 +57,7 @@ public class LabeledGrid {
     private double getMaxVal() {
         double maxVal = Double.MIN_VALUE;
 
-        for (List<Double> row : elements) {
+        for (List<Double> row : labels) {
             for (double elem : row) {
                 if (elem > maxVal) {
                     maxVal = elem;
@@ -60,22 +74,26 @@ public class LabeledGrid {
         float[] hsbColor = Color.RGBtoHSB(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), null);
         WritableRaster raster = image.getRaster();
 
-        for (var it = grid.cellIterator(); it.hasNext(); ) {
+        int totalCellSize = cellSize + lineWidth;
+
+        for (var it = cellIterator(); it.hasNext(); ) {
             Cell current = it.next();
 
             int x = current.getColumn();
             int y = current.getRow();
-            double value = elements.get(y).get(x);
-            Color curColor = getInterpolatedColor(value, minVal, maxVal, hsbColor[0], hsbColor[1]);
+            double value = labels.get(y).get(x);
+            Color curColor = getInterpolatedColor(value, minVal, maxVal, hsbColor[0], hsbColor[2]);
 
-            DrawUtils.fillRect(raster, x * (cellSize + lineWidth) + lineWidth,
-                    y * (cellSize + lineWidth) + lineWidth, cellSize, cellSize, curColor);
+            DrawUtils.fillRect(raster, x * totalCellSize,
+                    y * totalCellSize, totalCellSize, totalCellSize, curColor);
         }
     }
 
-    public void writeImage(Path path, int cellSize, int lineWidth, Color baseColor) throws IOException {
-        BufferedImage outputImage = grid.getImage(cellSize, lineWidth);
+    @Override
+    public void writeImage(Path path, int cellSize, int lineWidth) throws IOException {
+        BufferedImage outputImage = getImage(cellSize, lineWidth);
         colorGrid(outputImage, cellSize, lineWidth, baseColor);
+        drawBorders(outputImage.getRaster(), cellSize, lineWidth);
         ImageIO.write(outputImage, "png", path.toFile());
     }
 }
