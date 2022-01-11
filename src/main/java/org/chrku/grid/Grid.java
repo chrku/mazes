@@ -191,7 +191,7 @@ public class Grid {
         return builder.toString();
     }
 
-    public void writeImage(Path path, int cellSize, int lineWidth) throws IOException {
+    public BufferedImage getImage(int cellSize, int lineWidth) {
         // Determine width and height of output image
         int totalCellSize = cellSize + lineWidth;
         int width = numColumns * totalCellSize + lineWidth;
@@ -201,11 +201,11 @@ public class Grid {
         BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         WritableRaster raster = outputImage.getRaster();
 
-        Color white =  new Color(255, 255, 255);
-        Color black =  new Color(0, 0, 0);
+        Color white = new Color(255, 255, 255);
+        Color black = new Color(0, 0, 0);
 
         // White background
-        fillRect(raster, 0, 0, width, height, white);
+        DrawUtils.fillRect(raster, 0, 0, width, height, white);
 
         // Draw borders
         for (var it = cellIterator(); it.hasNext(); ) {
@@ -215,45 +215,36 @@ public class Grid {
             int y = current.getRow();
 
             if (current.getNorth() == null || !current.isLinked(current.getNorth())) {
-                fillRect(raster,
+                DrawUtils.fillRect(raster,
                         x * totalCellSize, y * totalCellSize,
                         cellSize + 2 * lineWidth, lineWidth,
                         black);
             }
             if (current.getSouth() == null || !current.isLinked(current.getSouth())) {
-                fillRect(raster,
+                DrawUtils.fillRect(raster,
                         x * totalCellSize, y * totalCellSize + totalCellSize,
                         cellSize + 2 * lineWidth, lineWidth,
                         black);
             }
             if (current.getWest() == null || !current.isLinked(current.getWest())) {
-                fillRect(raster,
+                DrawUtils.fillRect(raster,
                         x * totalCellSize, y * totalCellSize,
                         lineWidth, cellSize + 2 * lineWidth,
                         black);
             }
             if (current.getEast() == null || !current.isLinked(current.getEast())) {
-                fillRect(raster,
+                DrawUtils.fillRect(raster,
                         x * totalCellSize + totalCellSize, y * totalCellSize,
                         lineWidth, totalCellSize,
                         black);
             }
         }
 
-        ImageIO.write(outputImage, "png", path.toFile());
+        return outputImage;
     }
 
-    private void fillRect(WritableRaster raster, int x, int y, int width, int height, Color color) {
-        int[] comp = new int[3];
-
-        comp[0] = color.getRed();
-        comp[1] = color.getGreen();
-        comp[2] = color.getBlue();
-
-        for (int i = 0; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
-                raster.setPixel(x + j, y + i, comp);
-            }
-        }
+    public void writeImage(Path path, int cellSize, int lineWidth) throws IOException {
+        BufferedImage outputImage = getImage(cellSize, lineWidth);
+        ImageIO.write(outputImage, "png", path.toFile());
     }
 }
