@@ -163,40 +163,48 @@ public class Grid {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("+");
-        builder.append("---+".repeat(Math.max(0, numColumns)));
-        builder.append("\n");
+        writeHeader(builder);
 
         rowIterator().forEachRemaining((List<Cell> l) -> {
-            StringBuilder top = new StringBuilder();
-            StringBuilder bottom = new StringBuilder();
-
-            top.append("|");
-            bottom.append("+");
-
-            l.forEach((Cell c) -> {
-                top.append("   ");
-                if (!c.isLinked(c.getEast())) {
-                    top.append("|");
-                } else {
-                    top.append(" ");
-                }
-
-                if (!c.isLinked(c.getSouth())) {
-                    bottom.append("---");
-                } else {
-                    bottom.append("   ");
-                }
-                bottom.append("+");
-            });
-
-            builder.append(top);
-            builder.append("\n");
-            builder.append(bottom);
-            builder.append("\n");
+            writeRow(builder, l);
         });
 
         return builder.toString();
+    }
+
+    private void writeRow(StringBuilder builder, List<Cell> l) {
+        StringBuilder top = new StringBuilder();
+        StringBuilder bottom = new StringBuilder();
+
+        top.append("|");
+        bottom.append("+");
+
+        for (Cell c : l) {
+            top.append("   ");
+            if (!c.isLinked(c.getEast())) {
+                top.append("|");
+            } else {
+                top.append(" ");
+            }
+
+            if (!c.isLinked(c.getSouth())) {
+                bottom.append("---");
+            } else {
+                bottom.append("   ");
+            }
+            bottom.append("+");
+        }
+
+        builder.append(top);
+        builder.append("\n");
+        builder.append(bottom);
+        builder.append("\n");
+    }
+
+    private void writeHeader(StringBuilder builder) {
+        builder.append("+");
+        builder.append("---+".repeat(Math.max(0, numColumns)));
+        builder.append("\n");
     }
 
     protected void drawBorders(WritableRaster raster, int cellSize, int lineWidth) {

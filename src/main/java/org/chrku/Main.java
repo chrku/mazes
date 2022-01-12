@@ -56,6 +56,14 @@ class Main implements Callable<Integer> {
             " -1 for random", defaultValue = "-1")
     private int startColumn;
 
+    @Option(names = {"-er", "--endRow"}, description = "Ending row to use for shortest path visualization," +
+            " -1 for random", defaultValue = "-1")
+    private int endRow;
+
+    @Option(names = {"-ec", "--endColumn"}, description = "Ending column to use for shortest path visualization," +
+            " -1 for random", defaultValue = "-1")
+    private int endColumn;
+
     @Option(names = {"-h", "--numRows"}, description = "Number of rows for maze", required = true)
     private int numRows;
 
@@ -79,48 +87,18 @@ class Main implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Grid grid;
+        // Create grid
+        Grid grid = createGrid();
 
-        if (solve) {
-            Color baseColor = Color.RED;
+        // Generate maze using grid
+        generateMaze(grid);
 
-            switch (color) {
-                case red -> baseColor = Color.RED;
-                case green -> baseColor = Color.GREEN;
-                case blue -> baseColor = Color.BLUE;
-            }
+        // Output the grid to the chosen option
+        outputGrid(grid);
+        return 0;
+    }
 
-            grid = new LabeledGrid(numRows, numCols, baseColor);
-        } else {
-            grid = new Grid(numRows, numCols);
-        }
-
-        MazeGenerator generator;
-
-        switch (algorithm) {
-            case binary_tree -> generator = new BinaryTree();
-            case sidewinder -> generator = new Sidewinder();
-            default -> {
-                System.out.println("Unsupported algorithm");
-                return 1;
-            }
-        }
-
-        generator.generate(grid);
-
-        if (solve) {
-            if (startRow == -1) {
-                startRow = ThreadLocalRandom.current().nextInt(numRows);
-            }
-            if (startColumn == -1) {
-                startColumn = ThreadLocalRandom.current().nextInt(numCols);
-            }
-
-            DijkstraSolver solver = new DijkstraSolver(grid, startRow, startColumn);
-            solver.solve();
-            ((LabeledGrid) grid).setLabels(solver.getDistances());
-        }
-
+    private void outputGrid(Grid grid) {
         switch (outputFormat) {
             case image -> {
                 if (outputPath.toString().isEmpty()) {
@@ -136,7 +114,57 @@ class Main implements Callable<Integer> {
             }
             case text -> System.out.println(grid);
         }
+    }
 
-        return 0;
+    private Grid createGrid() {
+        Grid grid = null;
+
+        if (solve) {
+            grid = createShortestPathGrid(grid);
+        } else {
+            grid = new Grid(numRows, numCols);
+        }
+        return grid;
+    }
+
+    private Grid createShortestPathGrid(Grid grid) {
+        Color baseColor = Color.RED;
+
+        switch (color) {
+            case red -> baseColor = Color.RED;
+            case green -> baseColor = Color.GREEN;
+            case blue -> baseColor = Color.BLUE;
+        }
+
+        var labeledGrid = new LabeledGrid(numRows, numCols, baseColor);
+
+        if (startRow == -1) {
+            startRow = ThreadLocalRandom.current().nextInt(numRows);
+        }
+        if (startColumn == -1) {
+            startColumn = ThreadLocalRandom.current().nextInt(numCols);
+        }
+
+        DijkstraSolver solver = new DijkstraSolver(grid, startRow, startColumn);
+        solver.solve();
+        labeledGrid.setLabels(solver.getDistances());
+
+        grid = labeledGrid;
+        return grid;
+    }
+
+    private void generateMaze(Grid grid) {
+        MazeGenerator generator = null;
+
+        switch (algorithm) {
+            case binary_tree -> generator = new BinaryTree();
+            case sidewinder -> generator = new Sidewinder();
+            default -> {
+                System.out.println("Unsupported algorithm");
+                System.exit(1);
+            }
+        }
+
+        generator.generate(grid);
     }
 }

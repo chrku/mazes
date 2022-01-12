@@ -128,50 +128,69 @@ public class LabeledGrid extends Grid {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append("+");
-        builder.append((baseElement + "+").repeat(Math.max(0, columns())));
-        builder.append("\n");
-
+        writeHeader(builder, "+", (baseElement + "+").repeat(Math.max(0, columns())), "\n");
         rowIterator().forEachRemaining((List<Cell> l) -> {
-            for (int i = 0; i < verticalPad; ++i) {
-                StringBuilder top = new StringBuilder();
-                top.append("|");
-
-                for (Cell c : l) {
-                    if (i == verticalPad / 2) {
-                        top.append(" ");
-                        top.append(String.format("%" + maxWidthString + "s",
-                                labels.get(c.getRow()).get(c.getColumn())));
-                        top.append(" ");
-                    } else {
-                        top.append(baseBlank);
-                    }
-                    if (!c.isLinked(c.getEast())) {
-                        top.append("|");
-                    } else {
-                        top.append(" ");
-                    }
-                }
-
-                builder.append(top);
-                builder.append("\n");
-            }
-
-            StringBuilder bottom = new StringBuilder();
-            bottom.append("+");
-            for (Cell c : l) {
-                if (!c.isLinked(c.getSouth())) {
-                    bottom.append(baseElement);
-                } else {
-                    bottom.append(baseBlank);
-                }
-                bottom.append("+");
-            }
-
-            builder.append(bottom);
-            builder.append("\n");
+            writeTop(labels, maxWidthString, verticalPad, baseBlank, builder, l);
+            writeBottom(baseElement, baseBlank, builder, l);
         });
 
         return builder.toString();
+    }
+
+    private void writeHeader(StringBuilder builder,
+                             String str,
+                             String baseElement,
+                             String str1) {
+        builder.append(str);
+        builder.append(baseElement);
+        builder.append(str1);
+    }
+
+    private void writeBottom(String baseElement,
+                             String baseBlank,
+                             StringBuilder builder,
+                             List<Cell> l) {
+        StringBuilder bottom = new StringBuilder();
+        bottom.append("+");
+        for (Cell c : l) {
+            if (!c.isLinked(c.getSouth())) {
+                bottom.append(baseElement);
+            } else {
+                bottom.append(baseBlank);
+            }
+            bottom.append("+");
+        }
+
+        builder.append(bottom);
+        builder.append("\n");
+    }
+
+    private void writeTop(List<List<String>> labels,
+                          int maxWidthString,
+                          int verticalPad,
+                          String baseBlank,
+                          StringBuilder builder,
+                          List<Cell> l) {
+        for (int i = 0; i < verticalPad; ++i) {
+            StringBuilder top = new StringBuilder();
+            top.append("|");
+
+            for (Cell c : l) {
+                if (i == verticalPad / 2) {
+                    writeHeader(top, " ", String.format("%" + maxWidthString + "s",
+                            labels.get(c.getRow()).get(c.getColumn())), " ");
+                } else {
+                    top.append(baseBlank);
+                }
+                if (!c.isLinked(c.getEast())) {
+                    top.append("|");
+                } else {
+                    top.append(" ");
+                }
+            }
+
+            builder.append(top);
+            builder.append("\n");
+        }
     }
 }
