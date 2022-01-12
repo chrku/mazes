@@ -27,6 +27,10 @@ class Main implements Callable<Integer> {
         binary_tree, sidewinder
     }
 
+    private enum LabelColor {
+        red, green, blue
+    }
+
     @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from. " +
             "Valid values: ${COMPLETION-CANDIDATES}", required = true)
     private final Algorithm algorithm = Algorithm.binary_tree;
@@ -57,10 +61,12 @@ class Main implements Callable<Integer> {
 
     @Option(names = {"-w", "--numCols"}, description = "Number of columns for maze", required = true)
     private int numCols;
+
     @Option(names = {"-o", "--outputFormat"}, description = "Output format of maze. " +
             "Valid values: ${COMPLETION-CANDIDATES}",
             defaultValue = "image")
     private OutputFormat outputFormat;
+
     @Option(names = {"-p", "--path"}, description = "Output path", defaultValue = "")
     private Path outputPath;
 
@@ -132,9 +138,5 @@ class Main implements Callable<Integer> {
         }
 
         return 0;
-    }
-
-    private enum LabelColor {
-        red, green, blue
     }
 }

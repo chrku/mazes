@@ -7,6 +7,8 @@ import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class LabeledGrid extends Grid {
@@ -95,5 +97,81 @@ public class LabeledGrid extends Grid {
         colorGrid(outputImage, cellSize, lineWidth, baseColor);
         drawBorders(outputImage.getRaster(), cellSize, lineWidth);
         ImageIO.write(outputImage, "png", path.toFile());
+    }
+
+    private List<List<String>> getTextLabels() {
+        ArrayList<List<String>> lists = new ArrayList<>();
+        for (List<Double> list : labels) {
+            ArrayList<String> row = new ArrayList<>();
+            lists.add(row);
+            for (double d : list) {
+                row.add(Integer.toString((int) d));
+            }
+        }
+
+        return lists;
+    }
+
+    @Override
+    public String toString() {
+        var labels =  getTextLabels();
+        int maxWidthString = labels.stream()
+                .flatMap(Collection::stream)
+                .max(Comparator.comparingInt(String::length))
+                .orElse("")
+                .length();
+
+        int verticalPad = (maxWidthString / 2) * 2 + 1;
+
+        String baseElement = "-".repeat(maxWidthString + 2);
+        String baseBlank = " ".repeat(maxWidthString + 2);
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("+");
+        builder.append((baseElement + "+").repeat(Math.max(0, columns())));
+        builder.append("\n");
+
+        rowIterator().forEachRemaining((List<Cell> l) -> {
+            for (int i = 0; i < verticalPad; ++i) {
+                StringBuilder top = new StringBuilder();
+                top.append("|");
+
+                for (Cell c : l) {
+                    if (i == verticalPad / 2) {
+                        top.append(" ");
+                        top.append(String.format("%" + maxWidthString + "s",
+                                labels.get(c.getRow()).get(c.getColumn())));
+                        top.append(" ");
+                    } else {
+                        top.append(baseBlank);
+                    }
+                    if (!c.isLinked(c.getEast())) {
+                        top.append("|");
+                    } else {
+                        top.append(" ");
+                    }
+                }
+
+                builder.append(top);
+                builder.append("\n");
+            }
+
+            StringBuilder bottom = new StringBuilder();
+            bottom.append("+");
+            for (Cell c : l) {
+                if (!c.isLinked(c.getSouth())) {
+                    bottom.append(baseElement);
+                } else {
+                    bottom.append(baseBlank);
+                }
+                bottom.append("+");
+            }
+
+            builder.append(bottom);
+            builder.append("\n");
+        });
+
+        return builder.toString();
     }
 }
