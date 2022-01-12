@@ -33,13 +33,13 @@ class Main implements Callable<Integer> {
 
     @Option(names = {"-a", "--algorithm"}, description = "Maze algorithm to choose from. " +
             "Valid values: ${COMPLETION-CANDIDATES}", required = true)
-    private final Algorithm algorithm = Algorithm.binary_tree;
+    private Algorithm algorithm = Algorithm.binary_tree;
 
     @Option(names = {"-l", "--lineWidth"}, description = "Line width for image output", defaultValue = "2")
-    private final int lineWidth = 2;
+    private int lineWidth = 2;
 
     @Option(names = {"-cs", "--cellSize"}, description = "Cell size for image output", defaultValue = "20")
-    private final int cellSize = 20;
+    private int cellSize = 20;
 
     @Option(names = {"-s", "--solve"}, description = "Shows shortest paths from arbitrary starting point")
     private boolean solve;
