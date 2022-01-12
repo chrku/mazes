@@ -90,9 +90,6 @@ class Main implements Callable<Integer> {
         // Create grid
         Grid grid = createGrid();
 
-        // Generate maze using grid
-        generateMaze(grid);
-
         // Output the grid to the chosen option
         outputGrid(grid);
         return 0;
@@ -123,6 +120,7 @@ class Main implements Callable<Integer> {
             grid = createShortestPathGrid(grid);
         } else {
             grid = new Grid(numRows, numCols);
+            generateMaze(grid);
         }
         return grid;
     }
@@ -145,11 +143,14 @@ class Main implements Callable<Integer> {
             startColumn = ThreadLocalRandom.current().nextInt(numCols);
         }
 
-        DijkstraSolver solver = new DijkstraSolver(grid, startRow, startColumn);
+        generateMaze(labeledGrid);
+
+        DijkstraSolver solver = new DijkstraSolver(labeledGrid, startRow, startColumn);
         solver.solve();
         labeledGrid.setLabels(solver.getDistances());
 
         grid = labeledGrid;
+
         return grid;
     }
 
