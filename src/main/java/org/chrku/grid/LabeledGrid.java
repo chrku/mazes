@@ -115,12 +115,22 @@ public class LabeledGrid extends Grid {
 
     private List<List<String>> getTextLabels() {
         ArrayList<List<String>> lists = new ArrayList<>();
+
+        int rowIndex = 0;
         for (List<Double> list : labels) {
+            int colIndex = 0;
             ArrayList<String> row = new ArrayList<>();
             lists.add(row);
             for (double d : list) {
-                row.add(Integer.toString((int) d));
+                if (path != null && !path.contains(getCell(rowIndex, colIndex))) {
+                    row.add(Integer.toString((int) d));
+                } else {
+                    row.add("|" + (int) d + "|");
+                }
+                ++colIndex;
             }
+
+            ++rowIndex;
         }
 
         return lists;
