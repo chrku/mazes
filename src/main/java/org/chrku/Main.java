@@ -56,6 +56,10 @@ class Main implements Callable<Integer> {
             " -1 for random", defaultValue = "-1")
     private int startColumn;
 
+    @Option(names = {"-se", "--solveEnd"}, description = "Add an endpoint to the shortest path visualization",
+            defaultValue = "false")
+    private boolean solveEnd;
+
     @Option(names = {"-er", "--endRow"}, description = "Ending row to use for shortest path visualization," +
             " -1 for random", defaultValue = "-1")
     private int endRow;
@@ -134,7 +138,7 @@ class Main implements Callable<Integer> {
             case blue -> baseColor = Color.BLUE;
         }
 
-        var labeledGrid = new LabeledGrid(numRows, numCols, baseColor);
+        LabeledGrid labeledGrid = new LabeledGrid(numRows, numCols, baseColor, Color.YELLOW);
 
         if (startRow == -1) {
             startRow = ThreadLocalRandom.current().nextInt(numRows);
@@ -142,12 +146,21 @@ class Main implements Callable<Integer> {
         if (startColumn == -1) {
             startColumn = ThreadLocalRandom.current().nextInt(numCols);
         }
+        if (endRow == -1) {
+            endRow = ThreadLocalRandom.current().nextInt(numRows);
+        }
+        if (endColumn == -1) {
+            endColumn = ThreadLocalRandom.current().nextInt(numCols);
+        }
 
         generateMaze(labeledGrid);
 
         DijkstraSolver solver = new DijkstraSolver(labeledGrid, startRow, startColumn);
         solver.solve();
         labeledGrid.setLabels(solver.getDistances());
+        if (solveEnd) {
+            labeledGrid.setPath(solver.getPathTo(endRow, endColumn));
+        }
 
         grid = labeledGrid;
 

@@ -6,20 +6,22 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 
 public class LabeledGrid extends Grid {
+    private final Color pathColor;
     private final Color baseColor;
     private List<List<Double>> labels;
+    private Set<Cell> path;
 
-    public LabeledGrid(int numRows, int numCols, Color baseColor) {
+    public LabeledGrid(int numRows, int numCols, Color baseColor, Color pathColor) {
         super(numRows, numCols);
 
         this.baseColor = baseColor;
+        this.pathColor = pathColor;
         this.labels = new ArrayList<>();
+        this.path = Collections.emptySet();
 
         for (int i = 0; i < rows(); ++i) {
             labels.add(new ArrayList<>());
@@ -40,6 +42,10 @@ public class LabeledGrid extends Grid {
 
     public void setLabels(List<List<Double>> labels) {
         this.labels = labels;
+    }
+
+    public void setPath(Set<Cell> path) {
+        this.path = path;
     }
 
     private double getMinVal() {
@@ -74,6 +80,7 @@ public class LabeledGrid extends Grid {
         double minVal = getMinVal();
         double maxVal = getMaxVal();
         float[] hsbColor = Color.RGBtoHSB(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), null);
+        float[] hsbColorPath = Color.RGBtoHSB(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue(), null);
         WritableRaster raster = image.getRaster();
 
         int totalCellSize = cellSize + lineWidth;
@@ -84,7 +91,14 @@ public class LabeledGrid extends Grid {
             int x = current.getColumn();
             int y = current.getRow();
             double value = labels.get(y).get(x);
-            Color curColor = getInterpolatedColor(value, minVal, maxVal, hsbColor[0], hsbColor[2]);
+
+            Color curColor;
+            if (path != null && path.contains(current)) {
+                value = Math.min(value + 0.15 * maxVal, maxVal);
+                curColor = getInterpolatedColor(value, minVal, maxVal, hsbColorPath[0], hsbColorPath[2]);
+            } else {
+                curColor = getInterpolatedColor(value, minVal, maxVal, hsbColor[0], hsbColor[2]);
+            }
 
             DrawUtils.fillRect(raster, x * totalCellSize,
                     y * totalCellSize, totalCellSize, totalCellSize, curColor);
