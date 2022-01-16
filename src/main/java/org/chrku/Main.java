@@ -1,5 +1,6 @@
 package org.chrku;
 
+import org.chrku.algorithms.AldousBroder;
 import org.chrku.algorithms.BinaryTree;
 import org.chrku.algorithms.MazeGenerator;
 import org.chrku.algorithms.Sidewinder;
@@ -24,7 +25,7 @@ class Main implements Callable<Integer> {
     }
 
     private enum Algorithm {
-        binary_tree, sidewinder
+        binary_tree, sidewinder, aldous_broder
     }
 
     private enum LabelColor {
@@ -173,6 +174,7 @@ class Main implements Callable<Integer> {
         switch (algorithm) {
             case binary_tree -> generator = new BinaryTree();
             case sidewinder -> generator = new Sidewinder();
+            case aldous_broder -> generator = new AldousBroder();
             default -> {
                 System.out.println("Unsupported algorithm");
                 System.exit(1);
