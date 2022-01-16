@@ -1,9 +1,6 @@
 package org.chrku;
 
-import org.chrku.algorithms.AldousBroder;
-import org.chrku.algorithms.BinaryTree;
-import org.chrku.algorithms.MazeGenerator;
-import org.chrku.algorithms.Sidewinder;
+import org.chrku.algorithms.*;
 import org.chrku.grid.Grid;
 import org.chrku.grid.LabeledGrid;
 import org.chrku.solvers.DijkstraSolver;
@@ -25,7 +22,7 @@ class Main implements Callable<Integer> {
     }
 
     private enum Algorithm {
-        binary_tree, sidewinder, aldous_broder
+        binary_tree, sidewinder, aldous_broder, wilson
     }
 
     private enum LabelColor {
@@ -175,6 +172,7 @@ class Main implements Callable<Integer> {
             case binary_tree -> generator = new BinaryTree();
             case sidewinder -> generator = new Sidewinder();
             case aldous_broder -> generator = new AldousBroder();
+            case wilson ->  generator = new Wilson();
             default -> {
                 System.out.println("Unsupported algorithm");
                 System.exit(1);
