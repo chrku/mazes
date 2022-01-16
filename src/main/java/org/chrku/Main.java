@@ -22,7 +22,8 @@ class Main implements Callable<Integer> {
     }
 
     private enum Algorithm {
-        binary_tree, sidewinder, aldous_broder, wilson
+        binary_tree, sidewinder, aldous_broder, wilson,
+        hunt_and_kill
     }
 
     private enum LabelColor {
@@ -173,6 +174,7 @@ class Main implements Callable<Integer> {
             case sidewinder -> generator = new Sidewinder();
             case aldous_broder -> generator = new AldousBroder();
             case wilson ->  generator = new Wilson();
+            case hunt_and_kill -> generator = new HuntAndKill();
             default -> {
                 System.out.println("Unsupported algorithm");
                 System.exit(1);
