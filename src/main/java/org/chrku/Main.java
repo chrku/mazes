@@ -23,7 +23,7 @@ class Main implements Callable<Integer> {
 
     private enum Algorithm {
         binary_tree, sidewinder, aldous_broder, wilson,
-        hunt_and_kill
+        hunt_and_kill, recursive_backtracker
     }
 
     private enum LabelColor {
@@ -175,6 +175,7 @@ class Main implements Callable<Integer> {
             case aldous_broder -> generator = new AldousBroder();
             case wilson ->  generator = new Wilson();
             case hunt_and_kill -> generator = new HuntAndKill();
+            case recursive_backtracker -> generator = new RecursiveBacktracker();
             default -> {
                 System.out.println("Unsupported algorithm");
                 System.exit(1);

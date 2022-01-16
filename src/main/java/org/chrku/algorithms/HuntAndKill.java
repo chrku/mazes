@@ -35,9 +35,9 @@ public class HuntAndKill implements MazeGenerator {
 
                     if (cell.getLinks().isEmpty() && !visitedNeighbours.isEmpty()) {
                         current = cell;
-
                         Cell neighbour = visitedNeighbours.get(rng.nextInt(visitedNeighbours.size()));
                         current.link(neighbour, true);
+                        break;
                     }
                 }
             }
